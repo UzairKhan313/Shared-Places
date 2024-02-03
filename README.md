@@ -40,7 +40,7 @@ Welcome to the Place Sharing App, a full-stack web application built using the M
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/place-sharing-app.git
+   git clone https://github.com/UzairKhan313/Shared-Places.git
    cd place-sharing-app
    ```
 2. Set up environment variables:
