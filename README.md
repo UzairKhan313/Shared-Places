@@ -46,17 +46,23 @@ Welcome to the Place Sharing App, a full-stack web application built using the M
 2. Set up environment variables:
    Create a config director inside the the directory create config.env file and configure it with your MongoDB connection URL and other necessary variables.
 
-3. Start the server:
+3. Start the Production server:
 
 ```bash
 npm start
+```
+
+3. Start the Development server:
+
+```bash
+npm run dev
 ```
 
 4. Start the client
 
 ```bash
 cd frontend
-npm start
+npm run dev
 
 ```
 
