@@ -1,5 +1,7 @@
+import Users from './users/pages/Users'
+
 function App() {
-  return <h1>Let's start!</h1>
+  return <Users />
 }
 
 export default App
