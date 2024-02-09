@@ -1,24 +1,20 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 // Importing All Pages.
 import Users from './users/pages/Users'
 import NewPlace from './places/pages/NewPlace'
-import RouteErrorPage from './shared/pages/RouteErrorPage'
-
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <Users />,
-    errorElement: <RouteErrorPage />,
-  },
-  {
-    path: 'new/place',
-    element: <NewPlace />,
-  },
-])
+import MainNavigation from './shared/components/Navigation/MainNavigation'
 
 function App() {
-  return <RouterProvider router={router} />
+  return (
+    <main>
+      <MainNavigation />
+      <Routes>
+        <Route path="/" element={<Users />} />
+        <Route path="places/new" element={<NewPlace />} />
+      </Routes>
+    </main>
+  )
 }
 
 export default App
