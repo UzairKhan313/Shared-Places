@@ -1,17 +1,59 @@
-import React from 'react'
+import React, { useReducer } from 'react'
 
 import './Input.css'
+
+const inputReducer = (state, action) => {
+  switch (action.type) {
+    case 'CHANGE':
+      return {
+        ...state,
+        value: action.value,
+        isValid: true,
+      }
+
+    default:
+      return state
+  }
+}
+
 const Input = (props) => {
+  const [inputState, dispatch] = useReducer(inputReducer, {
+    value: '',
+    isValid: false,
+  })
+
+  const changeHandler = (event) => {
+    dispatch({ type: 'CHANGE', value: event.target.value })
+  }
+
   const element =
     props.element === 'input' ? (
-      <input type={props.type} id={props.id} placeholder={props.placeholder} />
+      <input
+        type={props.type}
+        id={props.id}
+        placeholder={props.placeholder}
+        value={inputState.value}
+        onChange={changeHandler}
+      />
     ) : (
-      <textarea name="" id={props.id} rows={props.row || 3}></textarea>
+      <textarea
+        name=""
+        id={props.id}
+        rows={props.row || 3}
+        value={inputState.value}
+        onChange={changeHandler}
+      />
     )
+
   return (
-    <div className={`form-control`}>
+    <div
+      className={`form-control ${
+        !inputState.isValid && 'form-control--invalid'
+      }`}
+    >
       <label htmlFor={props.id}>{props.label}</label>
       {element}
+      {!inputState.isValid && <p>{props.errorText}</p>}
     </div>
   )
 }
