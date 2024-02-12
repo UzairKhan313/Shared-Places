@@ -3,7 +3,6 @@ import React, { useCallback, useReducer } from 'react'
 import Input from '../../shared/components/FormElements/Input'
 import Button from '../../shared/components/FormElements/Button'
 import {
-  VALIDATOR_MIN,
   VALIDATOR_MINLENGTH,
   VALIDATOR_REQUIRE,
 } from '../../shared/utils/validators'
@@ -57,8 +56,13 @@ const NewPlace = () => {
     [dispatch]
   )
 
+  const placeFormSubmithandler = (event) => {
+    event.preventDefault() // send to the form.
+    console.log(formState.inputs)
+  }
+
   return (
-    <form className="place-form">
+    <form className="place-form" onSubmit={placeFormSubmithandler}>
       <Input
         id="title"
         element="input"
@@ -75,6 +79,14 @@ const NewPlace = () => {
         label="Description"
         validators={[VALIDATOR_MINLENGTH(5)]}
         errorText="Please Enter a valid Description (atleast 5 character long)"
+        onInput={inputHandler}
+      />
+      <Input
+        id="address"
+        element="input"
+        label="Address"
+        validators={[VALIDATOR_REQUIRE()]}
+        errorText="Please Enter a valid Address"
         onInput={inputHandler}
       />
       <Button type="submit" disabled={!formState.isValid}>
