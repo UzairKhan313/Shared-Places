@@ -11,9 +11,11 @@ import {
 import { useForm } from '../../shared/hooks/Form-Hooks'
 import Button from '../../shared/components/FormElements/Button'
 import './Auth.css'
+import { useAuthContext } from '../../shared/context/Auth-Context'
 
 const Auth = () => {
   const [isLoginMode, setLoginMode] = useState(true)
+  const { login } = useAuthContext()
   const [formState, inputHandler, setFormData] = useForm(
     {
       email: {
@@ -52,6 +54,7 @@ const Auth = () => {
 
   const authSubmitHandler = (e) => {
     e.preventDefault()
+    login()
     console.log(formState.inputs)
   }
   return (
