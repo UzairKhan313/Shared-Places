@@ -15,7 +15,7 @@ const UserPlaces = () => {
     const fetchPlaces = async () => {
       try {
         const responseData = await sendRequest(
-          `http://localhost:5000/api/v1/places/user/${userId}`
+          `http://localhost:5000/api/v1/places/user/${userId}/`
         )
         setIsLoadedPlace(responseData.places)
       } catch (error) {}
@@ -23,6 +23,11 @@ const UserPlaces = () => {
     fetchPlaces()
   }, [sendRequest])
 
+  const placeDeletedHandler = (deletedPlaceId) => {
+    setIsLoadedPlace((prevState) =>
+      prevState.filter((place) => place.id !== deletedPlaceId)
+    )
+  }
   return (
     <>
       <ErrorModal error={error} onClear={clearError} />
@@ -31,7 +36,9 @@ const UserPlaces = () => {
           <LoadingSpinner />
         </div>
       )}
-      {!isLoading && loadedPlace && <PlaceList places={loadedPlace} />}
+      {!isLoading && loadedPlace && (
+        <PlaceList places={loadedPlace} onDeletePlace={placeDeletedHandler} />
+      )}
     </>
   )
 }

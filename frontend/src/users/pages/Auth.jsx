@@ -89,7 +89,6 @@ const Auth = () => {
             'Content-Type': 'application/json',
           }
         )
-        console.log(responseData.user)
         login(responseData.user.id) // Auth Context login
       } catch (error) {}
     }
@@ -128,7 +127,7 @@ const Auth = () => {
             id="password"
             type="password"
             label="Password"
-            validators={[VALIDATOR_MINLENGTH(5)]}
+            validators={[VALIDATOR_MINLENGTH(6)]}
             errorText="Password should be atleast 5 character long."
             onInput={inputHandler}
           />

@@ -43,7 +43,7 @@ const getPlacesByUserId = async (req, res, next) => {
       )
     )
   }
-  if (!places || places.length === 0) {
+  if (!places) {
     return next(new HttpError("Couldn't found the Place for this user.", 404))
   }
   res.status(200).json({
@@ -156,7 +156,6 @@ const updatePlaceById = async (req, res, next) => {
 const deletePlace = async (req, res, next) => {
   // Getting a Place id is from url
   const placeId = req.params.pid
-  console.log(placeId)
   let place
   try {
     place = await Place.findById(placeId).populate('creator')
