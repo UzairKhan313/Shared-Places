@@ -1,5 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
+const cors = require('cors')
 
 const HttpError = require('./Model/http-error')
 const placeRoutes = require('./routes/Places-Routes')
@@ -9,6 +10,9 @@ const app = express()
 
 // Extracting incoming request for json data and convert it into a regular javascript data structures.
 app.use(bodyParser.json())
+
+// To handle cors Error.
+app.use(cors())
 
 // forwording the incomming request which  start with url like "/api/v1/places/" to the places routes.
 app.use('/api/v1/places', placeRoutes)

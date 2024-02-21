@@ -17,6 +17,7 @@ const getUsers = async (req, res, next) => {
       )
     )
   }
+
   res.status(200).json({
     message: 'All user Fetch Successfully',
     users: users.map((user) => user.toObject({ getters: true })),
@@ -70,7 +71,7 @@ const login = async (req, res, next) => {
 
   let identifiedUser
   try {
-    identifiedUser = await User.findOne({ email })
+    identifiedUser = await User.findOne({ email: email })
   } catch (error) {
     return next(
       new HttpError('User is not registered. Plaese registered first.', 404)
@@ -79,7 +80,10 @@ const login = async (req, res, next) => {
 
   if (!identifiedUser || identifiedUser.password !== password) {
     return next(
-      new HttpError('User is not registered. Plaese registered first.', 404)
+      new HttpError(
+        'Invalid Crendentials. Please provide a valid crendentials',
+        404
+      )
     )
   }
   res.status(201).json({

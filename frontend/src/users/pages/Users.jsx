@@ -1,11 +1,40 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import UsersList from '../components/UsersList'
-import userImage from '../../assets/img.jpg'
+import ErrorModal from '../../shared/components/UIElements/ErrorModal'
+import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner'
+import { useHttpClient } from '../../shared/hooks/Http-Hook'
 
 const Users = () => {
-  const USERS = [{ id: 'u1', name: 'Uzair khan', image: userImage, places: 3 }]
-  return <UsersList users={USERS} />
+  const [loadedUser, setLoadedUser] = useState()
+  const { error, isLoading, sendRequest, clearError } = useHttpClient()
+
+  useEffect(() => {
+    const fetchAllUser = async () => {
+      try {
+        const responseData = await sendRequest(
+          'http://localhost:5000/api/v1/users',
+          'GET'
+        )
+
+        setLoadedUser(responseData.users)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    fetchAllUser()
+  }, [sendRequest])
+  return (
+    <>
+      <ErrorModal error={error} onClear={clearError} />
+      {isLoading && (
+        <div className="center">
+          <LoadingSpinner />
+        </div>
+      )}
+      {!isLoading && loadedUser && <UsersList users={loadedUser} />}
+    </>
+  )
 }
 
 export default Users
