@@ -61,7 +61,7 @@ const Auth = () => {
     e.preventDefault()
     if (isLoginMode) {
       try {
-        await sendRequest(
+        const responseData = await sendRequest(
           'http://localhost:5000/api/v1/users/login',
           'POST',
           JSON.stringify({
@@ -73,11 +73,11 @@ const Auth = () => {
           }
         )
 
-        login() // Auth Context login
+        login(responseData.user.id) // Auth Context login
       } catch (err) {}
     } else {
       try {
-        await sendRequest(
+        const responseData = await sendRequest(
           'http://localhost:5000/api/v1/users/signup',
           'POST',
           JSON.stringify({
@@ -89,8 +89,8 @@ const Auth = () => {
             'Content-Type': 'application/json',
           }
         )
-
-        login() // Auth Context login
+        console.log(responseData.user)
+        login(responseData.user.id) // Auth Context login
       } catch (error) {}
     }
   }

@@ -1,48 +1,26 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
+
 import Input from '../../shared/components/FormElements/Input'
 import Button from '../../shared/components/FormElements/Button'
 import Card from '../../shared/components/UIElements/Card'
+import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner'
+import ErrorModal from '../../shared/components/UIElements/ErrorModal'
 import {
   VALIDATOR_MINLENGTH,
   VALIDATOR_REQUIRE,
 } from '../../shared/utils/validators'
 import { useForm } from '../../shared/hooks/Form-Hooks'
 import './NewPlace.css'
+import { useHttpClient } from '../../shared/hooks/Http-Hook'
+import { useAuthContext } from '../../shared/context/Auth-Context'
 
-const DUMMYPLACES = [
-  {
-    id: 'p1',
-    title: 'Unniversity of Peshawar',
-    description: 'One of the best University in Pakistan',
-    imageUrl:
-      'https://www.app.com.pk/wp-content/uploads/2023/12/University-of-Peshawar.jpg',
-    address: 'University road peshawar kpk pakistan',
-    location: {
-      lat: 34.025917,
-      lng: 71.560135,
-    },
-
-    creator: 'u1',
-  },
-  {
-    id: 'p2',
-    title: 'Government Collage Peshawar',
-    description: 'One of the best Collage in Pakistan',
-    imageUrl:
-      'https://photo-cdn.urdupoint.com/media/2022/08/_2/740x404/pic_1660398873.jpg',
-    address: 'University road peshawar kpk pakistan',
-    location: {
-      lat: 34.025917,
-      lng: 71.560135,
-    },
-
-    creator: 'u2',
-  },
-]
 const UpdatePlace = () => {
+  const { error, isLoading, sendRequest, clearError } = useHttpClient()
+  const [loadedPlace, setIsLoadedPlace] = useState()
+  const { userId } = useAuthContext()
   const { placeId } = useParams()
-  const [isLoading, setIsLoading] = useState(true)
+  const navigate = useNavigate()
 
   const [formState, inputHandler, setFormData] = useForm(
     {
@@ -51,25 +29,45 @@ const UpdatePlace = () => {
     },
     false
   )
-  const updatePlaceSubmitHandler = (event) => {
+  const updatePlaceSubmitHandler = async (event) => {
     event.preventDefault()
-    console.log(formState)
-  }
-  const place = DUMMYPLACES.find((place) => place.id === placeId)
-  useEffect(() => {
-    if (place) {
-      setFormData(
+    try {
+      sendRequest(
+        `http://localhost:5000/api/v1/places/${placeId}`,
+        'PATCH',
+        JSON.stringify({
+          title: formState.inputs.title.value,
+          description: formState.inputs.description.value,
+        }),
         {
-          title: { value: place.title, isValid: true },
-          description: { value: place.description, isValid: true },
-        },
-        true
+          'Content-Type': 'application/json',
+        }
       )
-    }
-    setIsLoading(false)
-  }, [setFormData, place])
+      navigate('/' + userId + '/places')
+    } catch (error) {}
+  }
 
-  if (!place) {
+  useEffect(() => {
+    const fetchPlace = async () => {
+      try {
+        console.log(placeId)
+        const responseData = await sendRequest(
+          `http://localhost:5000/api/v1/places/${placeId}`
+        )
+        setIsLoadedPlace(responseData.place)
+        setFormData(
+          {
+            title: { value: loadedPlace.title, isValid: true },
+            description: { value: loadedPlace.description, isValid: true },
+          },
+          true
+        )
+      } catch (error) {}
+    }
+    fetchPlace()
+  }, [sendRequest, placeId, setFormData])
+
+  if (!loadedPlace && !error) {
     return (
       <div className="center">
         <Card>
@@ -81,37 +79,42 @@ const UpdatePlace = () => {
   if (isLoading) {
     return (
       <div className="center">
-        <h2>Loading....</h2>
+        <LoadingSpinner />
       </div>
     )
   }
   return (
-    <form className="place-form" onSubmit={updatePlaceSubmitHandler}>
-      <Input
-        id="title"
-        element="input"
-        type="text"
-        label="Title"
-        errorText="Plase provide a valid title"
-        validators={[VALIDATOR_REQUIRE()]}
-        initialValue={formState.inputs.title.value}
-        initialValid={formState.inputs.title.isValid}
-        onInput={inputHandler}
-      />
-      <Input
-        id="description"
-        element="textarea"
-        label="Description"
-        errorText="Plase provide a valid description (atleast 5 charachter long)"
-        validators={[VALIDATOR_MINLENGTH(5)]}
-        initialValue={formState.inputs.description.value}
-        initialValid={formState.inputs.description.isValid}
-        onInput={inputHandler}
-      />
-      <Button type="submit" disabled={!formState.isValid}>
-        Update Place
-      </Button>
-    </form>
+    <>
+      <ErrorModal error={error} onClear={clearError} />
+      {!isLoading && loadedPlace && (
+        <form className="place-form" onSubmit={updatePlaceSubmitHandler}>
+          <Input
+            id="title"
+            element="input"
+            type="text"
+            label="Title"
+            errorText="Plase provide a valid title"
+            validators={[VALIDATOR_REQUIRE()]}
+            initialValue={loadedPlace.title}
+            initialValid={true}
+            onInput={inputHandler}
+          />
+          <Input
+            id="description"
+            element="textarea"
+            label="Description"
+            errorText="Plase provide a valid description (atleast 5 charachter long)"
+            validators={[VALIDATOR_MINLENGTH(5)]}
+            initialValue={loadedPlace.description}
+            initialValid={true}
+            onInput={inputHandler}
+          />
+          <Button type="submit" disabled={!formState.isValid}>
+            Update Place
+          </Button>
+        </form>
+      )}
+    </>
   )
 }
 

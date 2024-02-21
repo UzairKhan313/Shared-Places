@@ -11,7 +11,7 @@ const PlaceList = ({ places }) => {
       <div className="place-list center">
         <Card>
           <h2>No place found. May be create one</h2>
-          <Button to="/place/new">Share Place</Button>
+          <Button to="/places/new">Share Place</Button>
         </Card>
       </div>
     )
@@ -22,7 +22,7 @@ const PlaceList = ({ places }) => {
         <PlaceItem
           key={place.id}
           id={place.id}
-          image={place.imageUrl}
+          image={place.image}
           title={place.title}
           description={place.description}
           address={place.address}

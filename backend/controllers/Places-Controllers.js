@@ -3,28 +3,29 @@ const { validationResult } = require('express-validator')
 const HttpError = require('../Model/http-error')
 const Place = require('../Model/Place')
 const User = require('../Model/User')
-const { default: mongoose } = require('mongoose')
+
 // const getCoordinatesForAddress = require('../utils/Locations')
 
 const getPlaceById = async (req, res, next) => {
   // Getting a Place id is from url
   const placeId = req.params.pid
   // This Place will be fetch from data base.
-  let userWithPlaces
+
+  let place
   try {
-    place = await Place.findById(placeId).populate('places')
+    place = await Place.findById(placeId)
   } catch (error) {
     return next(
       new HttpError("Couldn't found the place for provided place Id", 404)
     )
   }
-  if (!userWithPlaces || userWithPlaces.places.length === 0) {
+  if (!place) {
     return next(new HttpError("Something went couldn't found the place", 500))
   }
 
   res.status(200).json({
     message: 'Place Fetch successfully',
-    place: userWithPlaces.places.toObject({ getters: true }),
+    place: place.toObject({ getters: true }),
   })
 }
 
