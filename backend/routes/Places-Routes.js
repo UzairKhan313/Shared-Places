@@ -2,6 +2,7 @@ const express = require('express')
 const { check } = require('express-validator')
 
 const HttpError = require('../Model/http-error')
+const FileUpload = require('../middleware/File-upload')
 const {
   getPlaceById,
   getPlacesByUserId,
@@ -18,6 +19,7 @@ router.get('/user/:uid', getPlacesByUserId)
 
 router.post(
   '/new',
+  FileUpload.single('image'),
   [
     check('title').not().isEmpty().withMessage('Title must not be empty'),
     check('description')

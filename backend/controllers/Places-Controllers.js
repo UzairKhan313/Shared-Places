@@ -1,4 +1,5 @@
 const { validationResult } = require('express-validator')
+const fs = require('fs')
 
 const HttpError = require('../Model/http-error')
 const Place = require('../Model/Place')
@@ -80,7 +81,6 @@ const createNewPlace = async (req, res, next) => {
   try {
     user = await User.findById(creator)
   } catch (error) {
-    console.log(error)
     return next(
       new HttpError('Creating place faild. Please try again letter.', 500)
     )
@@ -94,8 +94,7 @@ const createNewPlace = async (req, res, next) => {
     address,
     creator: user.id,
     location: coordinates,
-    image:
-      'https://www.app.com.pk/wp-content/uploads/2023/12/University-of-Peshawar.jpg',
+    image: req.file.destination + '/' + req.file.filename,
   })
 
   try {
@@ -174,6 +173,7 @@ const deletePlace = async (req, res, next) => {
     )
     return next(error)
   }
+  const imagePath = place.image
   try {
     await Place.findByIdAndDelete(placeId)
     place.creator.places.pull(place)
@@ -186,6 +186,7 @@ const deletePlace = async (req, res, next) => {
     return next(err)
   }
 
+  fs.unlink(imagePath, (err) => console.log(err))
   res.status(201).json({
     message: 'Places Deleted Successfully',
     place: place.toObject({ getters: true }),

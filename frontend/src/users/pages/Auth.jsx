@@ -5,6 +5,7 @@ import Input from '../../shared/components/FormElements/Input'
 import Button from '../../shared/components/FormElements/Button'
 import ErrorModal from '../../shared/components/UIElements/ErrorModal'
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner'
+import ImageUpload from '../../shared/components/FormElements/ImageUpload'
 import { useForm } from '../../shared/hooks/Form-Hooks'
 import { useAuthContext } from '../../shared/context/Auth-Context'
 import { useHttpClient } from '../../shared/hooks/Http-Hook'
@@ -39,6 +40,7 @@ const Auth = () => {
         {
           ...formState.inputs,
           name: undefined,
+          image: undefined,
         },
         formState.inputs.name.isValid && formState.inputs.password.isValid
       )
@@ -50,6 +52,7 @@ const Auth = () => {
             value: '',
             isValid: false,
           },
+          image: { value: null, isValid: false },
         },
         false
       )
@@ -59,6 +62,7 @@ const Auth = () => {
 
   const authSubmitHandler = async (e) => {
     e.preventDefault()
+
     if (isLoginMode) {
       try {
         const responseData = await sendRequest(
@@ -77,20 +81,22 @@ const Auth = () => {
       } catch (err) {}
     } else {
       try {
+        const formData = new FormData()
+
+        formData.append('name', formState.inputs.name.value)
+        formData.append('email', formState.inputs.email.value)
+        formData.append('password', formState.inputs.password.value)
+        formData.append('image', formState.inputs.image.value)
+
         const responseData = await sendRequest(
           'http://localhost:5000/api/v1/users/signup',
           'POST',
-          JSON.stringify({
-            name: formState.inputs.name.value,
-            email: formState.inputs.email.value,
-            password: formState.inputs.password.value,
-          }),
-          {
-            'Content-Type': 'application/json',
-          }
+          formData // The fetch api automatically add right header for the from data.
         )
         login(responseData.user.id) // Auth Context login
-      } catch (error) {}
+      } catch (error) {
+        console.log(error)
+      }
     }
   }
 
@@ -102,6 +108,14 @@ const Auth = () => {
         <h2>{isLoginMode ? 'Login' : 'Sign up'} Required</h2>
         <hr />
         <form onSubmit={authSubmitHandler}>
+          {!isLoginMode && (
+            <ImageUpload
+              center
+              id="image"
+              onInput={inputHandler}
+              errorText="Please Provide an image"
+            />
+          )}
           {!isLoginMode && (
             <Input
               element="input"

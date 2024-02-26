@@ -1,6 +1,8 @@
+const fs = require('fs')
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
+const path = require('path')
 
 const HttpError = require('./Model/http-error')
 const placeRoutes = require('./routes/Places-Routes')
@@ -10,6 +12,16 @@ const app = express()
 
 // Extracting incoming request for json data and convert it into a regular javascript data structures.
 app.use(bodyParser.json())
+
+// Serving image staticaly.
+app.use(
+  '/backend/uploads/images',
+  (req, res, next) => {
+    console.log('request of static images', req)
+    next()
+  },
+  express.static(path.join('backend/uploads', 'images'))
+)
 
 // To handle cors Error.
 app.use(cors())
@@ -28,12 +40,15 @@ app.use((req, res, next) => {
 
 // Middle ware for Error. This is excute only when the above middle ware yield to error.
 app.use((error, req, res, next) => {
+  if (req.file) {
+    fs.unlink(req.file.path, (err) => {
+      console.log(err)
+    })
+  }
   if (res.headerSent) {
     return next(error)
   }
-  res
-    .status(error.code || 500)
-    .json({ message: error.message || 'Something went wrong.' })
+  res.status(500).json({ message: error.message || 'Something went wrong.' })
 })
 
 module.exports = app

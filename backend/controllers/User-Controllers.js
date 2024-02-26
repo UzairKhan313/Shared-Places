@@ -31,6 +31,7 @@ const signup = async (req, res, next) => {
     return next(new HttpError(errorMessage, 422))
   }
   const { name, email, password } = req.body
+
   let existingUser
   try {
     existingUser = await User.findOne({ email })
@@ -43,11 +44,12 @@ const signup = async (req, res, next) => {
       new HttpError('Email Already Registerd. Please pick another one', 422)
     )
   }
+
   let user = new User({
     name,
     email,
     password,
-    image: 'www.image.com',
+    image: req.file.destination + '/' + req.file.filename,
     places: [],
   })
   try {
