@@ -16,10 +16,6 @@ app.use(bodyParser.json())
 // Serving image staticaly.
 app.use(
   '/backend/uploads/images',
-  (req, res, next) => {
-    console.log('request of static images', req)
-    next()
-  },
   express.static(path.join('backend/uploads', 'images'))
 )
 

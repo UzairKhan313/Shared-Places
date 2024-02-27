@@ -18,7 +18,7 @@ import { useAuthContext } from '../../shared/context/Auth-Context'
 const UpdatePlace = () => {
   const { error, isLoading, sendRequest, clearError } = useHttpClient()
   const [loadedPlace, setIsLoadedPlace] = useState()
-  const { userId } = useAuthContext()
+  const { userId, token } = useAuthContext()
   const { placeId } = useParams()
   const navigate = useNavigate()
 
@@ -41,6 +41,7 @@ const UpdatePlace = () => {
         }),
         {
           'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token,
         }
       )
       navigate('/' + userId + '/places')
@@ -50,7 +51,6 @@ const UpdatePlace = () => {
   useEffect(() => {
     const fetchPlace = async () => {
       try {
-        console.log(placeId)
         const responseData = await sendRequest(
           `http://localhost:5000/api/v1/places/${placeId}`
         )

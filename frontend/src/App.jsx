@@ -8,10 +8,37 @@ import MainNavigation from './shared/components/Navigation/MainNavigation'
 import UpdatePlace from './places/pages/UpdatePlace'
 import Auth from './users/pages/Auth'
 import { useAuthContext } from './shared/context/Auth-Context'
+import { useEffect } from 'react'
+
+let logoutTimer
 
 function App() {
-  const { isLoggedIn } = useAuthContext()
+  const { isLoggedIn, login, logout, tokenExpirationDate, token } =
+    useAuthContext()
+
+  useEffect(() => {
+    if (token && tokenExpirationDate) {
+      const remainingTime = tokenExpirationDate.getTime() - new Date().getTime()
+      logoutTimer = setTimeout(logout, remainingTime)
+    } else {
+      clearTimeout(logoutTimer)
+    }
+  }, [token, logout, tokenExpirationDate])
+
+  useEffect(() => {
+    const storeData = JSON.parse(localStorage.getItem('userData'))
+
+    if (
+      storeData &&
+      storeData.token &&
+      new Date(storeData.expiration) > new Date()
+    ) {
+      login(storeData.userId, storeData.token, new Date(storeData.expiration))
+    }
+  }, [login])
+
   let routes
+
   if (isLoggedIn) {
     routes = (
       <Routes>

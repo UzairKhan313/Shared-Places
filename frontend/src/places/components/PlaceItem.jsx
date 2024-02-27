@@ -20,7 +20,7 @@ const PlaceItem = ({
 }) => {
   const [showMap, setShowMap] = useState(false)
   const [showConfrimModal, setShowConfirmModal] = useState(false)
-  const { isLoggedIn, userId } = useAuthContext()
+  const { userId, token } = useAuthContext()
   const { error, isLoading, sendRequest, clearError } = useHttpClient()
 
   const showDeleteHandler = () => {
@@ -33,7 +33,12 @@ const PlaceItem = ({
   const confirmDeleteHandler = async (id) => {
     setShowConfirmModal(false)
     try {
-      await sendRequest(`http://localhost:5000/api/v1/places/${id}`, 'DELETE')
+      await sendRequest(
+        `http://localhost:5000/api/v1/places/${id}`,
+        'DELETE',
+        null,
+        { Authorization: 'Bearer ' + token }
+      )
       onDelete(id)
     } catch (error) {}
   }

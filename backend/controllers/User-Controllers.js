@@ -1,4 +1,6 @@
 const { validationResult } = require('express-validator')
+const bcryprt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 
 const HttpError = require('../Model/http-error')
 const User = require('../Model/User')
@@ -26,6 +28,7 @@ const getUsers = async (req, res, next) => {
 
 const signup = async (req, res, next) => {
   const errors = validationResult(req)
+
   if (!errors.isEmpty()) {
     const errorMessage = errors.errors[0].msg
     return next(new HttpError(errorMessage, 422))
@@ -44,11 +47,18 @@ const signup = async (req, res, next) => {
       new HttpError('Email Already Registerd. Please pick another one', 422)
     )
   }
+  let hashPassword
+  try {
+    hashPassword = await bcryprt.hash(password, 12)
+  } catch (error) {
+    const err = new HttpError("Couldn't hash password. Please try again", 500)
+    return next(err)
+  }
 
   let user = new User({
     name,
     email,
-    password,
+    password: hashPassword,
     image: req.file.destination + '/' + req.file.filename,
     places: [],
   })
@@ -57,9 +67,22 @@ const signup = async (req, res, next) => {
   } catch (error) {
     return next(new HttpError('Sign up failed. Please try again letter', 500))
   }
+  let token
+  try {
+    token = jwt.sign(
+      { userId: user.id, email: user.email },
+      process.env.JWT_PRIVATE_KEY,
+      { expiresIn: process.env.TOKEN_EXPIRATION_TIME }
+    )
+  } catch (error) {
+    return next(new HttpError('Sign up failed. Please try again letter', 500))
+  }
+
   res.status(201).json({
     message: 'User Registered Successfully',
-    user: user.toObject({ getters: true }),
+    userId: user.id,
+    email: user.email,
+    token: token,
   })
 }
 
@@ -80,7 +103,7 @@ const login = async (req, res, next) => {
     )
   }
 
-  if (!identifiedUser || identifiedUser.password !== password) {
+  if (!identifiedUser) {
     return next(
       new HttpError(
         'Invalid Crendentials. Please provide a valid crendentials',
@@ -88,9 +111,38 @@ const login = async (req, res, next) => {
       )
     )
   }
+  let isValidPassword
+  try {
+    isValidPassword = await bcryprt.compare(password, identifiedUser.password)
+  } catch (error) {
+    return next(new HttpError('Faild to compare password', 500))
+  }
+
+  if (!isValidPassword) {
+    return next(
+      new HttpError(
+        'Invalid Crendentials. Please provide a valid crendentials',
+        404
+      )
+    )
+  }
+  let token
+  try {
+    token = jwt.sign(
+      { userId: identifiedUser.id, email: identifiedUser.email },
+      process.env.JWT_PRIVATE_KEY,
+      { expiresIn: process.env.TOKEN_EXPIRATION_TIME }
+    )
+  } catch (error) {
+    return next(
+      new HttpError('Logging in failed. Please try again letter', 500)
+    )
+  }
   res.status(201).json({
     message: 'User Login Successfully',
-    user: identifiedUser.toObject({ getters: true }),
+    userId: identifiedUser.id,
+    email: identifiedUser.email,
+    token: token,
   })
 }
 

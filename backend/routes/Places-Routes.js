@@ -1,7 +1,7 @@
 const express = require('express')
 const { check } = require('express-validator')
 
-const HttpError = require('../Model/http-error')
+const Check_Auth = require('../middleware/Check-Auth')
 const FileUpload = require('../middleware/File-upload')
 const {
   getPlaceById,
@@ -16,6 +16,8 @@ const router = express.Router()
 router.get('/:pid', getPlaceById)
 
 router.get('/user/:uid', getPlacesByUserId)
+
+router.use(Check_Auth)
 
 router.post(
   '/new',

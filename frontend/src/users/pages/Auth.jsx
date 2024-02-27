@@ -77,7 +77,7 @@ const Auth = () => {
           }
         )
 
-        login(responseData.user.id) // Auth Context login
+        login(responseData.userId, responseData.token) // Auth Context login
       } catch (err) {}
     } else {
       try {
@@ -91,9 +91,9 @@ const Auth = () => {
         const responseData = await sendRequest(
           'http://localhost:5000/api/v1/users/signup',
           'POST',
-          formData // The fetch api automatically add right header for the from data.
+          formData // The fetch api automatically add right header for the form data.
         )
-        login(responseData.user.id) // Auth Context login
+        login(responseData.userId, responseData.token) // Auth Context login
       } catch (error) {
         console.log(error)
       }
