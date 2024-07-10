@@ -1,43 +1,44 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate } from "react-router-dom";
 
 // Importing All Pages.
-import Users from './users/pages/Users'
-import NewPlace from './places/pages/NewPlace'
-import UserPlaces from './places/pages/UserPlaces'
-import MainNavigation from './shared/components/Navigation/MainNavigation'
-import UpdatePlace from './places/pages/UpdatePlace'
-import Auth from './users/pages/Auth'
-import { useAuthContext } from './shared/context/Auth-Context'
-import { useEffect } from 'react'
+import Users from "./users/pages/Users";
+import NewPlace from "./places/pages/NewPlace";
+import UserPlaces from "./places/pages/UserPlaces";
+import MainNavigation from "./shared/components/Navigation/MainNavigation";
+import UpdatePlace from "./places/pages/UpdatePlace";
+import Auth from "./users/pages/Auth";
+import { useAuthContext } from "./shared/context/Auth-Context";
+import { useEffect } from "react";
 
-let logoutTimer
+let logoutTimer;
 
 function App() {
   const { isLoggedIn, login, logout, tokenExpirationDate, token } =
-    useAuthContext()
+    useAuthContext();
 
   useEffect(() => {
     if (token && tokenExpirationDate) {
-      const remainingTime = tokenExpirationDate.getTime() - new Date().getTime()
-      logoutTimer = setTimeout(logout, remainingTime)
+      const remainingTime =
+        tokenExpirationDate.getTime() - new Date().getTime();
+      logoutTimer = setTimeout(logout, remainingTime);
     } else {
-      clearTimeout(logoutTimer)
+      clearTimeout(logoutTimer);
     }
-  }, [token, logout, tokenExpirationDate])
+  }, [token, logout, tokenExpirationDate]);
 
   useEffect(() => {
-    const storeData = JSON.parse(localStorage.getItem('userData'))
+    const storeData = JSON.parse(localStorage.getItem("userData"));
 
     if (
       storeData &&
       storeData.token &&
       new Date(storeData.expiration) > new Date()
     ) {
-      login(storeData.userId, storeData.token, new Date(storeData.expiration))
+      login(storeData.userId, storeData.token, new Date(storeData.expiration));
     }
-  }, [login])
+  }, [login]);
 
-  let routes
+  let routes;
 
   if (isLoggedIn) {
     routes = (
@@ -49,7 +50,7 @@ function App() {
         {/* Redirect to / */}
         <Route path="/*" element={<Navigate to="/" />} />
       </Routes>
-    )
+    );
   } else {
     routes = (
       <Routes>
@@ -59,7 +60,7 @@ function App() {
         {/* Redirection... to /auth */}
         <Route path="/*" element={<Navigate to="/auth" />} />
       </Routes>
-    )
+    );
   }
 
   return (
@@ -67,7 +68,7 @@ function App() {
       <MainNavigation />
       {routes}
     </main>
-  )
+  );
 }
 
-export default App
+export default App;

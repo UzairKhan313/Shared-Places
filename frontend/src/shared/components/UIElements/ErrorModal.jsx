@@ -6,7 +6,7 @@ import Button from '../FormElements/Button'
 const ErrorModal = (props) => {
   return (
     <Modal
-      onCancel={props.onClear}
+      onClose={props.onClear}
       headerText="An Error Occurred!"
       show={!!props.error}
       footerChildren={<Button onClick={props.onClear}>Okay</Button>}

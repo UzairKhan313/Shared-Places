@@ -1,71 +1,71 @@
-import React, { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
-import Input from '../../shared/components/FormElements/Input'
-import Button from '../../shared/components/FormElements/Button'
-import Card from '../../shared/components/UIElements/Card'
-import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner'
-import ErrorModal from '../../shared/components/UIElements/ErrorModal'
+import Input from "../../shared/components/FormElements/Input";
+import Button from "../../shared/components/FormElements/Button";
+import Card from "../../shared/components/UIElements/Card";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 import {
   VALIDATOR_MINLENGTH,
   VALIDATOR_REQUIRE,
-} from '../../shared/utils/validators'
-import { useForm } from '../../shared/hooks/Form-Hooks'
-import './NewPlace.css'
-import { useHttpClient } from '../../shared/hooks/Http-Hook'
-import { useAuthContext } from '../../shared/context/Auth-Context'
+} from "../../shared/utils/validators";
+import { useForm } from "../../shared/hooks/Form-Hooks";
+import "./NewPlace.css";
+import { useHttpClient } from "../../shared/hooks/Http-Hook";
+import { useAuthContext } from "../../shared/context/Auth-Context";
 
 const UpdatePlace = () => {
-  const { error, isLoading, sendRequest, clearError } = useHttpClient()
-  const [loadedPlace, setIsLoadedPlace] = useState()
-  const { userId, token } = useAuthContext()
-  const { placeId } = useParams()
-  const navigate = useNavigate()
+  const { error, isLoading, sendRequest, clearError } = useHttpClient();
+  const [loadedPlace, setIsLoadedPlace] = useState();
+  const { userId, token } = useAuthContext();
+  const { placeId } = useParams();
+  const navigate = useNavigate();
 
   const [formState, inputHandler, setFormData] = useForm(
     {
-      title: { value: '', isValid: false },
-      description: { value: '', isValid: false },
+      title: { value: "", isValid: false },
+      description: { value: "", isValid: false },
     },
     false
-  )
+  );
   const updatePlaceSubmitHandler = async (event) => {
-    event.preventDefault()
+    event.preventDefault();
     try {
-      sendRequest(
+      await sendRequest(
         `http://localhost:5000/api/v1/places/${placeId}`,
-        'PATCH',
+        "PATCH",
         JSON.stringify({
           title: formState.inputs.title.value,
           description: formState.inputs.description.value,
         }),
         {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + token,
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
         }
-      )
-      navigate('/' + userId + '/places')
+      );
+      navigate("/" + userId + "/places");
     } catch (error) {}
-  }
+  };
 
   useEffect(() => {
     const fetchPlace = async () => {
       try {
         const responseData = await sendRequest(
           `http://localhost:5000/api/v1/places/${placeId}`
-        )
-        setIsLoadedPlace(responseData.place)
+        );
+        setIsLoadedPlace(responseData.place);
         setFormData(
           {
             title: { value: loadedPlace.title, isValid: true },
             description: { value: loadedPlace.description, isValid: true },
           },
           true
-        )
+        );
       } catch (error) {}
-    }
-    fetchPlace()
-  }, [sendRequest, placeId, setFormData])
+    };
+    fetchPlace();
+  }, [sendRequest, placeId, setFormData]);
 
   if (!loadedPlace && !error) {
     return (
@@ -74,14 +74,14 @@ const UpdatePlace = () => {
           <h2>Could not find the place.</h2>
         </Card>
       </div>
-    )
+    );
   }
   if (isLoading) {
     return (
       <div className="center">
         <LoadingSpinner />
       </div>
-    )
+    );
   }
   return (
     <>
@@ -115,7 +115,7 @@ const UpdatePlace = () => {
         </form>
       )}
     </>
-  )
-}
+  );
+};
 
-export default UpdatePlace
+export default UpdatePlace;

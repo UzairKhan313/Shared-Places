@@ -1,48 +1,48 @@
-const express = require('express')
-const { check } = require('express-validator')
+const express = require("express");
+const { check } = require("express-validator");
 
-const Check_Auth = require('../middleware/Check-Auth')
-const FileUpload = require('../middleware/File-upload')
+const Check_Auth = require("../middleware/Check-Auth");
+const FileUpload = require("../middleware/File-upload");
 const {
   getPlaceById,
   getPlacesByUserId,
   createNewPlace,
   updatePlaceById,
   deletePlace,
-} = require('../controllers/Places-Controllers')
+} = require("../controllers/Places-Controllers");
 
-const router = express.Router()
+const router = express.Router();
 
-router.get('/:pid', getPlaceById)
+router.get("/:pid", getPlaceById);
 
-router.get('/user/:uid', getPlacesByUserId)
+router.get("/user/:uid", getPlacesByUserId);
 
-router.use(Check_Auth)
+router.use(Check_Auth);
 
 router.post(
-  '/new',
-  FileUpload.single('image'),
+  "/new",
+  FileUpload.single("image"),
   [
-    check('title').not().isEmpty().withMessage('Title must not be empty'),
-    check('description')
+    check("title").not().isEmpty().withMessage("Title must not be empty"),
+    check("description")
       .isLength({ min: 5 })
-      .withMessage('Description must be atleast 5 character long'),
-    check('address').not().isEmpty().withMessage('address most not be empty.'),
+      .withMessage("Description must be atleast 5 character long"),
+    check("address").not().isEmpty().withMessage("address most not be empty."),
   ],
   createNewPlace
-)
+);
 
 router.patch(
-  '/:pid',
+  "/:pid",
   [
-    check('title').not().isEmpty().withMessage('Title must not be empty'),
-    check('description')
+    check("title").not().isEmpty().withMessage("Title must not be empty"),
+    check("description")
       .isLength({ min: 5 })
-      .withMessage('Description must be atleast 5 character long'),
+      .withMessage("Description must be atleast 5 character long"),
   ],
   updatePlaceById
-)
+);
 
-router.delete('/:pid', deletePlace)
+router.delete("/:pid", deletePlace);
 
-module.exports = router
+module.exports = router;
